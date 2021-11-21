@@ -72,8 +72,11 @@ async def validate_file(file: UploadFile = File(...)):
     with open(fpath, 'w') as f:
         f.write(fd.read().decode('utf8'))
     try:
-        model, _ = build_model(fpath)
+        model = build_model(fpath)
+        print('Model validation success!!')
     except Exception as e:
+        print('Exception while validating model. Validation failed!!')
+        print(e)
         resp['status'] = 404
         resp['message'] = e
     return resp
@@ -96,13 +99,12 @@ async def validate_b64(fenc: str = ''):
     with open(fpath, 'wb') as f:
         f.write(fdec)
     try:
-        model, _ = build_model(fpath)
+        model = build_model(fpath)
+        print('Model validation success!!')
     except Exception as e:
         print('Exception while validating model. Validation failed!!')
         resp['status'] = 404
         resp['message'] = str(e)
-    else:
-        print('Model validation success!!')
     return resp
 
 
@@ -120,19 +122,14 @@ async def interpret(model_file: UploadFile = File(...),
     u_id = uuid.uuid4().hex[0:8]
     model_path = os.path.join(
         TMP_DIR,
-        f'model-{u_id}.goal'
+        f'model-{u_id}.auto'
     )
-    gen_path = os.path.join(
-        TMP_DIR,
-        f'gen-{u_id}'
-    )
+
     with open(model_path, 'w') as f:
         f.write(fd.read().decode('utf8'))
     try:
-        out_dir = generate_model(model_path, gen_path)
         if container == 'subprocess':
-            exec_path = os.path.join(out_dir, 'goal_checker.py')
-            pid = run_subprocess(exec_path)
+            pid = run_interpreter(model_path)
             if wait:
                 pid.wait()
         else:
@@ -143,6 +140,6 @@ async def interpret(model_file: UploadFile = File(...),
     return resp
 
 
-def run_subprocess(exec_path):
-    pid = subprocess.Popen(['python3', exec_path], close_fds=True)
+def run_interpreter(model_path: str):
+    pid = subprocess.Popen(['smauto', 'interpret', model_path], close_fds=True)
     return pid
