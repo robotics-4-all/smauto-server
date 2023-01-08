@@ -40,4 +40,6 @@ INFO:     Started reloader process [3867604] using StatReload
 This means that you can access the API locally via `http://localhost:8080`.
 
 Furthermore, you can access the UI for accessing the endpoints via your
-preferred web browser at `http://0.0.0.0:8080/docs`
+preferred web browser at `http://localhost:8080/docs`
+
+![2023-01-08-153513_1543x470_scrot](https://user-images.githubusercontent.com/4770702/211198940-2ee67e2c-5d8c-4820-ab16-d7fa21226bf8.png)
